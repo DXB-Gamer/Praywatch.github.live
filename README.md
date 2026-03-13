@@ -393,7 +393,16 @@ body.quran-open .q2-nav-popup{visibility:visible}
 .q2-np-go:hover{background:linear-gradient(135deg,rgba(201,168,76,.3),rgba(201,168,76,.15));box-shadow:0 0 16px rgba(201,168,76,.15)}
 
 /* Page 2 scroll-up tab (when pill hidden) */
-.q2-uptab{display:none}
+.q2-uptab{
+  display:none;position:fixed;bottom:max(72px,calc(env(safe-area-inset-bottom)+64px));
+  left:50%;transform:translateX(-50%);
+  background:rgba(8,12,26,.9);border:1px solid rgba(201,168,76,.25);
+  border-radius:20px;padding:8px 18px;
+  flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;z-index:99;
+  -webkit-tap-highlight-color:transparent;
+}
+.q2-uptab.show{display:flex}
 .q2-uptab-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2)}
 
 /* ─── LOADING OVERLAY ─── */
@@ -431,9 +440,12 @@ button,select,.action-btn,.q2-back,.q2-pill-btn,.q2-pill-open,.q2-np-close,.q2-n
 /* Safe area insets */
 #app{padding-top:max(44px,env(safe-area-inset-top));padding-bottom:max(64px,env(safe-area-inset-bottom))}
 .q2-nav-pill{bottom:max(24px,calc(env(safe-area-inset-bottom)+16px))}
-.q2-uptab{padding-bottom:max(4px,env(safe-area-inset-bottom))}
 .q2-nav-popup{bottom:max(80px,calc(env(safe-area-inset-bottom)+70px))}
 .q2-scroll{padding-bottom:max(120px,calc(env(safe-area-inset-bottom)+100px))}
+@media(max-width:600px){
+  .q2-nav-pill{bottom:max(80px,calc(env(safe-area-inset-bottom)+72px))}
+  .q2-nav-popup{bottom:max(140px,calc(env(safe-area-inset-bottom)+130px))}
+}
 
 /* Bigger touch targets */
 .q2-back{width:44px;height:44px;font-size:18px}
@@ -1820,22 +1832,20 @@ function requestNotifPermission() {
 
 function initNotifications() {
   if (!('Notification' in window)) return;
-  
-  // If already granted, just set up silently
+
+  // Already granted — set up silently
   if (Notification.permission === 'granted') {
     notifGranted = true;
     registerSW();
     schedulePrayerNotifications();
     return;
   }
-  
-  // If denied, don't ask again
+
+  // Denied — don't ask again
   if (Notification.permission === 'denied') return;
-  
-  // Show banner after 3 seconds
-  setTimeout(function() {
-    ge('notif-banner').classList.add('show');
-  }, 3000);
+
+  // Show banner straight away so user sees it on load
+  ge('notif-banner').classList.add('show');
 }
 
 var _notifAllow = ge('notif-allow');
